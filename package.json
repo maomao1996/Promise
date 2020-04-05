@@ -4,7 +4,8 @@
   "description": "promise",
   "private": true,
   "scripts": {
-    "easy": "node test/easy.js"
+    "easy": "node test/easy.js",
+    "async": "node test/easy-async.js"
   },
   "repository": {
     "type": "git",
