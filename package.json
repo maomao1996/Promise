@@ -1,0 +1,18 @@
+{
+  "name": "promise",
+  "version": "1.0.0",
+  "description": "promise",
+  "private": true,
+  "scripts": {
+    "easy": "node test/easy.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maomao1996/Promise.git"
+  },
+  "author": "maomao1996 <1714487678@qq.com>",
+  "bugs": {
+    "url": "https://github.com/maomao1996/Promise/issues"
+  },
+  "homepage": "https://github.com/maomao1996/Promise#readme"
+}
