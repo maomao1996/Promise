@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "easy": "node test/easy.js",
-    "async": "node test/easy-async.js"
+    "async": "node test/easy-async.js",
+    "chain": "node test/easy-chain.js"
   },
   "repository": {
     "type": "git",
