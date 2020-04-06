@@ -6,7 +6,8 @@
   "scripts": {
     "easy": "node test/easy.js",
     "async": "node test/easy-async.js",
-    "chain": "node test/easy-chain.js"
+    "chain": "node test/easy-chain.js",
+    "chain-async": "node test/easy-chain-async.js"
   },
   "repository": {
     "type": "git",
