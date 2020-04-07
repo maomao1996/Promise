@@ -228,6 +228,40 @@ class Promise {
       }
     )
   }
+
+  /**
+   * Promise.resolve() 实现
+   * 将现有对象转为 Promise 实例，该实例的状态为 resolved
+   * https://es6.ruanyifeng.com/#docs/promise#Promise-resolve
+   */
+  static resolve(value) {
+    // 如果参数是 Promise 实例，那么Promise.resolve将不做任何修改、原封不动地返回这个实例。
+    if (value instanceof Promise) {
+      return value
+    }
+
+    return new Promise((resolve, reject) => {
+      // 如果参数是一个 thenable 对象
+      // thenable 对象指的是具有 then 方法的对象
+      if (isObject(value && isFunction(value.then))) {
+        value.then(resolve, reject)
+      } else {
+        // 如果参数是一个原始值，则返回一个新的 Promise 对象，状态为 resolved
+        resolve(value)
+      }
+    })
+  }
+
+  /**
+   * Promise.reject() 实现
+   * 将现有对象转为 Promise 实例，该实例的状态为 rejected
+   * https://es6.ruanyifeng.com/#docs/promise#Promise-reject
+   */
+  static reject(error) {
+    return new Promise((resolve, reject) => {
+      reject(error)
+    })
+  }
 }
 
 Promise.defer = Promise.deferred = function () {
