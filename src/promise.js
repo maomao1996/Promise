@@ -129,6 +129,7 @@ class Promise {
   }
 
   /**
+   * Promise.prototype.then() 实现
    * then 方法接收两个参数 onFulfilled 和 onRejected
    * onFulfilled 和 onRejected 均为可选参数
    */
@@ -198,6 +199,34 @@ class Promise {
     })
 
     return promise2
+  }
+
+  /**
+   * Promise.prototype.catch() 实现
+   * catch 用于指定发生错误时的回调函数，实际就是 .then(null, onRejected) 的别名
+   */
+  catch(cb) {
+    return this.then(null, cb)
+  }
+
+  /**
+   * Promise.prototype.finally() 实现
+   * finally 方法用于指定不管 Promise 对象最后状态如何，都会执行的操作
+   * 在 finally 后还能继续 then ，并会将值原封不动的传递下去
+   */
+  finally(cb) {
+    return this.then(
+      (value) => {
+        return Promise.resolve(cb()).then(() => {
+          return value
+        })
+      },
+      (error) => {
+        return Promise.resolve(cb()).then(() => {
+          throw error
+        })
+      }
+    )
   }
 }
 
