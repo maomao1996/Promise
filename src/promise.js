@@ -39,14 +39,14 @@ function resolvePromise(promise2, x, resolve, reject) {
     // 防止取值时出错
     try {
       let then = x.then
-      // 如果 then 是一个函数就认为他是一个 promise，如果不是就直接调用 resolve(x)
+      // 如果 then 是一个函数就认为他是一个 Promise，如果不是就直接调用 resolve(x)
       if (isFunction(then)) {
         then.call(
           x,
           (y) => {
             if (called) return
             called = true
-            // 防止 y 的返回值还是一个 promsie
+            // 防止 y 的返回值还是一个 Promise
             resolvePromise(promise2, y, resolve, reject)
           },
           (r) => {
@@ -260,6 +260,70 @@ class Promise {
   static reject(error) {
     return new Promise((resolve, reject) => {
       reject(error)
+    })
+  }
+
+  /**
+   * Promise.all() 实现
+   * 用于将多个 Promise 实例，包装成一个新的 Promise 实例
+   * 只有所有的 Promise 状态成功才会成功，如果其中一个 Promise 的状态失败就会失败
+   * https://es6.ruanyifeng.com/#docs/promise#Promise-all
+   */
+  static all(promises) {
+    return new Promise((resolve, reject) => {
+      const result = []
+      // 记录当前已成功的 Promise 数量
+      let num = 0
+      // 如果传入一个空数组则直接返回
+      if (promises.length === 0) {
+        resolve(result)
+      }
+
+      function check(i, data) {
+        result[i] = data
+        num++
+        // 只有成功的 Promise 数量等于传入的数组长度时才调用 resolve
+        if (num === promises.length) {
+          resolve(result)
+        }
+      }
+
+      for (let i = 0; i < promises.length; i++) {
+        promises[i].then(
+          (v) => {
+            check(i, v)
+          },
+          (e) => {
+            // 当其中一个 Promise 失败时直接调用 reject
+            reject(e)
+            return
+          }
+        )
+      }
+    })
+  }
+
+  /**
+   * Promise.race() 实现
+   * 用于将多个 Promise 实例，包装成一个新的 Promise 实例
+   * 新的 Promise 实例状态会根据最先更改状态的 Promise 而更改状态
+   * https://es6.ruanyifeng.com/#docs/promise#Promise-race
+   */
+  static race(promises) {
+    return new Promise((resolve, reject) => {
+      for (let i = 0; i < promises.length; i++) {
+        // 只要有一个 Promise 状态发生改变，就调用其状态对应的回调方法
+        Promise.resolve(promises[i]).then(
+          (v) => {
+            resolve(v)
+            return
+          },
+          (e) => {
+            reject(e)
+            return
+          }
+        )
+      }
     })
   }
 }
