@@ -243,7 +243,7 @@ class Promise {
     return new Promise((resolve, reject) => {
       // 如果参数是一个 thenable 对象
       // thenable 对象指的是具有 then 方法的对象
-      if (isObject(value && isFunction(value.then))) {
+      if (isObject(value) && isFunction(value.then)) {
         value.then(resolve, reject)
       } else {
         // 如果参数是一个原始值，则返回一个新的 Promise 对象，状态为 resolved

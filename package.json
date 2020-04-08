@@ -8,7 +8,7 @@
     "async": "node test/easy-async.js",
     "chain": "node test/easy-chain.js",
     "chain-async": "node test/easy-chain-async.js",
-    "funtion": "node test/promise-function.js",
+    "function": "node test/promise-function.js",
     "test": "promises-aplus-tests src/promise.js"
   },
   "repository": {
