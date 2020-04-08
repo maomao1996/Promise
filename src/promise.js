@@ -326,8 +326,94 @@ class Promise {
       }
     })
   }
+
+  /**
+   * Promise.allSettled() 实现
+   * 用于将多个 Promise 实例，包装成一个新的 Promise 实例
+   * 新的 Promise 实例只有等到所有这些参数实例都返回结果，不管是 resolved 还是 rejected ，包装实例才会结束，一旦结束，状态总是 resolved
+   * 该方法由 ES2020 引入
+   * https://es6.ruanyifeng.com/#docs/promise#Promise-allSettled
+   */
+  static allSettled(promises) {
+    return new Promise((resolve, reject) => {
+      const result = []
+      // 记录当前已返回结果的 Promise 数量
+      let num = 0
+      // 如果传入一个空数组则直接返回
+      if (promises.length === 0) {
+        resolve(result)
+      }
+
+      function check(i, data) {
+        result[i] = data
+        num++
+        // 只有已返回结果的 Promise 数量等于传入的数组长度时才调用 resolve
+        if (num === promises.length) {
+          resolve(result)
+        }
+      }
+
+      for (let i = 0; i < promises.length; i++) {
+        promises[i].then(
+          (value) => {
+            check(i, {
+              status: 'resolved',
+              value,
+            })
+          },
+          (reason) => {
+            check(i, {
+              status: 'rejected',
+              reason,
+            })
+          }
+        )
+      }
+    })
+  }
+
+  /**
+   * Promise.any() 实现
+   * 用于将多个 Promise 实例，包装成一个新的 Promise 实例
+   * 只要参数实例有一个变成 resolved 状态，包装实例就会变成 resolved 状态；如果所有参数实例都变成 rejected 状态，包装实例就会变成 rejected 状态
+   * https://es6.ruanyifeng.com/#docs/promise#Promise-any
+   */
+  static any(promises) {
+    return new Promise((resolve, reject) => {
+      const rejects = []
+      // 记录当前已失败的 Promise 数量
+      let num = 0
+      // 如果传入一个空数组则直接返回
+      if (promises.length === 0) {
+        resolve()
+      }
+
+      function check(i, data) {
+        rejects[i] = data
+        num++
+        // 只有失败的 Promise 数量等于传入的数组长度时才调用 reject
+        if (num === promises.length) {
+          reject(rejects)
+        }
+      }
+
+      for (let i = 0; i < promises.length; i++) {
+        promises[i].then(
+          (v) => {
+            resolve(v)
+            return
+          },
+          (r) => {
+            // 当其中一个 Promise 失败时直接调用 reject
+            check(i, r)
+          }
+        )
+      }
+    })
+  }
 }
 
+// promises-aplus-tests
 Promise.defer = Promise.deferred = function () {
   const dfd = {}
   dfd.promise = new Promise((resolve, reject) => {

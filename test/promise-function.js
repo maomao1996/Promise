@@ -1,5 +1,16 @@
 const Promise = require('../src/promise')
 
+function createPromis(t1, t2) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve('成功了')
+    }, t1)
+    setTimeout(() => {
+      reject('出错了')
+    }, t2)
+  })
+}
+
 console.log('------ catch finally ------')
 
 new Promise((resolve, reject) => {
@@ -57,16 +68,6 @@ setTimeout(() => {
 setTimeout(() => {
   console.log('\n------ Promise.race ------')
 
-  function createPromis(t1, t2) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve('成功了')
-      }, t1)
-      setTimeout(() => {
-        reject('出错了')
-      }, t2)
-    })
-  }
   Promise.race([])
     .then((res) => {
       console.log('race then', res)
@@ -91,3 +92,51 @@ setTimeout(() => {
       console.log('all2 catch', err)
     })
 }, 150)
+
+setTimeout(() => {
+  console.log('\n------ Promise.race ------')
+
+  Promise.allSettled([])
+    .then((res) => {
+      console.log('allSettled then', res)
+    })
+    .catch((err) => {
+      console.log('allSettled catch', err)
+    })
+  const all = [createPromis(5, 10), createPromis(10, 5)]
+  Promise.allSettled(all)
+    .then((res) => {
+      console.log('allSettled all then', res)
+    })
+    .catch((err) => {
+      console.log('allSettled all catch', err)
+    })
+}, 200)
+
+setTimeout(() => {
+  console.log('\n------ Promise.any ------')
+
+  Promise.any([])
+    .then((res) => {
+      console.log('any then', res)
+    })
+    .catch((err) => {
+      console.log('any catch', err)
+    })
+  const all1 = [createPromis(5, 10), createPromis(5, 10)]
+  Promise.any(all1)
+    .then((res) => {
+      console.log('any all1 then', res)
+    })
+    .catch((err) => {
+      console.log('any all1 catch', err)
+    })
+  const all2 = [createPromis(20, 10), createPromis(20, 10)]
+  Promise.any(all2)
+    .then((res) => {
+      console.log('any all2 then', res)
+    })
+    .catch((err) => {
+      console.log('any all2 catch', err)
+    })
+}, 250)
