@@ -204,6 +204,7 @@ class Promise {
   /**
    * Promise.prototype.catch() 实现
    * catch 用于指定发生错误时的回调函数，实际就是 .then(null, onRejected) 的别名
+   * https://es6.ruanyifeng.com/#docs/promise#Promise-prototype-catch
    */
   catch(cb) {
     return this.then(null, cb)
@@ -213,19 +214,17 @@ class Promise {
    * Promise.prototype.finally() 实现
    * finally 方法用于指定不管 Promise 对象最后状态如何，都会执行的操作
    * 在 finally 后还能继续 then ，并会将值原封不动的传递下去
+   * finally 本质上是 then 方法的特例
+   * 该方法由 ES2018 引入
+   * https://es6.ruanyifeng.com/#docs/promise#Promise-prototype-finally
    */
   finally(cb) {
     return this.then(
-      (value) => {
-        return Promise.resolve(cb()).then(() => {
-          return value
-        })
-      },
-      (error) => {
-        return Promise.resolve(cb()).then(() => {
+      (value) => Promise.resolve(cb()).then(() => value),
+      (error) =>
+        Promise.resolve(cb()).then(() => {
           throw error
         })
-      }
     )
   }
 
@@ -279,6 +278,7 @@ class Promise {
         resolve(result)
       }
 
+      // resolve 验证函数
       function check(i, data) {
         result[i] = data
         num++
@@ -344,6 +344,7 @@ class Promise {
         resolve(result)
       }
 
+      // resolve 验证函数
       function check(i, data) {
         result[i] = data
         num++
@@ -388,6 +389,7 @@ class Promise {
         resolve()
       }
 
+      // reject 验证函数
       function check(i, data) {
         rejects[i] = data
         num++
@@ -400,11 +402,11 @@ class Promise {
       for (let i = 0; i < promises.length; i++) {
         promises[i].then(
           (v) => {
+            // 当其中一个 Promise 成功时直接调用 resolve
             resolve(v)
             return
           },
           (r) => {
-            // 当其中一个 Promise 失败时直接调用 reject
             check(i, r)
           }
         )
@@ -413,7 +415,7 @@ class Promise {
   }
 }
 
-// promises-aplus-tests
+// promises-aplus-tests 测试方法
 Promise.defer = Promise.deferred = function () {
   const dfd = {}
   dfd.promise = new Promise((resolve, reject) => {
