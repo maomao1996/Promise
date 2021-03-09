@@ -4,11 +4,11 @@
 
 // 定义三个常量表示 Promise 的状态
 // 等待状态 可以变更为成功或失败
-const PENDING = 'PENDING'
+const PENDING = 'pending'
 // 成功状态
-const RESOLVED = 'RESOLVED'
+const FULFILLED = 'fulfilled'
 // 失败状态
-const REJECTED = 'REJECTED'
+const REJECTED = 'rejected'
 
 /**
  * 工具方法
@@ -95,7 +95,7 @@ class Promise {
     const resolve = (value) => {
       nextTick(() => {
         if (this.state === PENDING) {
-          this.state = RESOLVED
+          this.state = FULFILLED
           this.value = value
 
           // 执行 resolve 回调队列
@@ -148,7 +148,7 @@ class Promise {
      * 所以在 then 执行的时候 onFulfilled, onRejected 可能会出现错误，需要捕获错误，并执行失败回调（处理成失败状态）
      */
     const promise2 = new Promise((resolve, reject) => {
-      if (this.state === RESOLVED) {
+      if (this.state === FULFILLED) {
         nextTick(() => {
           // 成功状态调用 onFulfilled
           try {
@@ -358,13 +358,13 @@ class Promise {
         promises[i].then(
           (value) => {
             check(i, {
-              status: 'resolved',
+              status: FULFILLED,
               value,
             })
           },
           (reason) => {
             check(i, {
-              status: 'rejected',
+              status: REJECTED,
               reason,
             })
           }
