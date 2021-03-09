@@ -1,142 +1,479 @@
+const assert = require('assert')
 const Promise = require('../src/promise')
 
-function createPromis(t1, t2) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve('成功了')
-    }, t1)
-    setTimeout(() => {
-      reject('出错了')
-    }, t2)
+describe('Promise Function', function () {
+  describe('Promise.prototype.catch', () => {
+    it('throws on implicit undefined', function () {
+      return Promise.all().then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
   })
-}
 
-console.log('------ catch finally ------')
+  describe('Promise.all', function () {
+    it('throws on implicit undefined', function () {
+      return Promise.all().then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on explicit undefined', function () {
+      return Promise.all(undefined).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on null', function () {
+      return Promise.all(null).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on 0', function () {
+      return Promise.all(0).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on false', function () {
+      return Promise.all(false).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on a number', function () {
+      return Promise.all(20).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on a boolean', function () {
+      return Promise.all(true).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on an object', function () {
+      return Promise.all({ test: 'object' }).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('works on multiple resolved promises', function () {
+      return Promise.all([Promise.resolve(), Promise.resolve()]).then(
+        function () {
+          assert.ok(true)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+    it('works on rejected promises', function () {
+      return Promise.all([Promise.reject(), Promise.resolve()]).then(
+        function () {
+          assert.fail()
+        },
+        function () {
+          assert.ok(true)
+        }
+      )
+    })
+    it('works on empty array', function () {
+      return Promise.all([]).then(
+        function (arr) {
+          assert.ok(arr.length === 0)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+  })
 
-new Promise((resolve, reject) => {
-  reject('出错了')
+  describe('Promise.race', function () {
+    it('throws on implicit undefined', function () {
+      return Promise.race().then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on explicit undefined', function () {
+      return Promise.race(undefined).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on null', function () {
+      return Promise.race(null).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on 0', function () {
+      return Promise.race(0).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on false', function () {
+      return Promise.race(false).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on a number', function () {
+      return Promise.race(20).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on a boolean', function () {
+      return Promise.race(true).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on an object', function () {
+      return Promise.race({ test: 'object' }).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on multiple promises', function () {
+      return Promise.race(Promise.resolve(), Promise.resolve()).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('works on basic values', function () {
+      return Promise.race([1, 2, 3]).then(
+        function (val) {
+          assert.ok(val == 1)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+    it('works on success promise', function () {
+      var doneProm = Promise.resolve(10)
+      var pendingProm1 = new Promise(function () {})
+      var pendingProm2 = new Promise(function () {})
+
+      return Promise.race([pendingProm1, doneProm, pendingProm2]).then(
+        function (val) {
+          assert.ok(val == 10)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+    it('works on empty array', function () {
+      var prom = Promise.race([])
+      return assert(prom instanceof Promise)
+    })
+  })
+
+  describe('Promise.allSettled', function () {
+    it('throws on implicit undefined', function () {
+      return Promise.allSettled().then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on explicit undefined', function () {
+      return Promise.allSettled(undefined).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on null', function () {
+      return Promise.allSettled(null).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on 0', function () {
+      return Promise.allSettled(0).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on false', function () {
+      return Promise.allSettled(false).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on a number', function () {
+      return Promise.allSettled(20).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on a boolean', function () {
+      return Promise.allSettled(true).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on an object', function () {
+      return Promise.allSettled({ test: 'object' }).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('works on multiple resolved promises', function () {
+      return Promise.allSettled([Promise.resolve(), Promise.resolve()]).then(
+        function () {
+          assert.ok(true)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+    it('works even with rejected promises', function () {
+      return Promise.allSettled([Promise.reject(), Promise.resolve()]).then(
+        function (results) {
+          assert.equal(results[0].status, 'rejected')
+          assert.equal(results[1].status, 'fulfilled')
+          assert.ok(true)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+    it('works on empty array', function () {
+      return Promise.allSettled([]).then(
+        function (arr) {
+          assert.ok(arr.length === 0)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+  })
+
+  describe('Promise.any', function () {
+    it('throws on implicit undefined', function () {
+      return Promise.any().then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on explicit undefined', function () {
+      return Promise.any(undefined).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on null', function () {
+      return Promise.any(null).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on 0', function () {
+      return Promise.any(0).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on false', function () {
+      return Promise.any(false).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on a number', function () {
+      return Promise.any(20).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on a boolean', function () {
+      return Promise.any(true).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('throws on an object', function () {
+      return Promise.any({ test: 'object' }).then(
+        function () {
+          assert.fail()
+        },
+        function (error) {
+          assert.ok(error instanceof Error)
+        }
+      )
+    })
+    it('works on resolved promises', function () {
+      return Promise.any([Promise.resolve()]).then(
+        function () {
+          assert.ok(true)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+    it('works on rejected promises', function () {
+      return Promise.any([Promise.reject()]).then(
+        function () {
+          assert.fail()
+        },
+        function () {
+          assert.ok(true)
+        }
+      )
+    })
+    it('works on empty array', function () {
+      return Promise.any([]).then(
+        function () {
+          assert.ok(true)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+  })
 })
-  .catch((err) => {
-    console.log('catch', err)
-  })
-  .finally(() => {
-    console.log('finally')
-  })
-
-setTimeout(() => {
-  console.log('\n------ Promise.resolve Promise.reject ------')
-  const resolve = Promise.resolve('resolve')
-  setTimeout(() => {
-    console.log('Promise.resolve', resolve)
-  }, 0)
-  const reject = Promise.reject('reject')
-  setTimeout(() => {
-    console.log('Promise.reject', reject)
-  }, 0)
-}, 50)
-
-setTimeout(() => {
-  console.log('\n------ Promise.all ------')
-  Promise.all([])
-    .then((res) => {
-      console.log('all then', res)
-    })
-    .catch((err) => {
-      console.log('all catch', err)
-    })
-  const all1 = [
-    Promise.resolve('all resolve1'),
-    Promise.resolve('all resolve2'),
-  ]
-  Promise.all(all1)
-    .then((res) => {
-      console.log('all1 then', res)
-    })
-    .catch((err) => {
-      console.log('all1 catch', err)
-    })
-  const all2 = [Promise.resolve('all resolve'), Promise.reject('all reject')]
-  Promise.all(all2)
-    .then((res) => {
-      console.log('all2 then', res)
-    })
-    .catch((err) => {
-      console.log('all2 catch', err)
-    })
-}, 100)
-
-setTimeout(() => {
-  console.log('\n------ Promise.race ------')
-
-  Promise.race([])
-    .then((res) => {
-      console.log('race then', res)
-    })
-    .catch((err) => {
-      console.log('race catch', err)
-    })
-  const all1 = [createPromis(5, 10), createPromis(5, 10)]
-  Promise.race(all1)
-    .then((res) => {
-      console.log('all1 then', res)
-    })
-    .catch((err) => {
-      console.log('all1 catch', err)
-    })
-  const all2 = [createPromis(20, 10), createPromis(20, 10)]
-  Promise.race(all2)
-    .then((res) => {
-      console.log('all2 then', res)
-    })
-    .catch((err) => {
-      console.log('all2 catch', err)
-    })
-}, 150)
-
-setTimeout(() => {
-  console.log('\n------ Promise.race ------')
-
-  Promise.allSettled([])
-    .then((res) => {
-      console.log('allSettled then', res)
-    })
-    .catch((err) => {
-      console.log('allSettled catch', err)
-    })
-  const all = [createPromis(5, 10), createPromis(10, 5)]
-  Promise.allSettled(all)
-    .then((res) => {
-      console.log('allSettled all then', res)
-    })
-    .catch((err) => {
-      console.log('allSettled all catch', err)
-    })
-}, 200)
-
-setTimeout(() => {
-  console.log('\n------ Promise.any ------')
-
-  Promise.any([])
-    .then((res) => {
-      console.log('any then', res)
-    })
-    .catch((err) => {
-      console.log('any catch', err)
-    })
-  const all1 = [createPromis(5, 10), createPromis(5, 10)]
-  Promise.any(all1)
-    .then((res) => {
-      console.log('any all1 then', res)
-    })
-    .catch((err) => {
-      console.log('any all1 catch', err)
-    })
-  const all2 = [createPromis(20, 10), createPromis(20, 10)]
-  Promise.any(all2)
-    .then((res) => {
-      console.log('any all2 then', res)
-    })
-    .catch((err) => {
-      console.log('any all2 catch', err)
-    })
-}, 250)

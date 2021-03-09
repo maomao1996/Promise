@@ -8,7 +8,7 @@
     "async": "node test/easy-async.js",
     "chain": "node test/easy-chain.js",
     "chain-async": "node test/easy-chain-async.js",
-    "function": "node test/promise-function.js",
+    "function": "mocha test/promise-function.js",
     "test": "promises-aplus-tests src/promise.js"
   },
   "repository": {
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/maomao1996/Promise#readme",
   "devDependencies": {
+    "mocha": "^8.3.1",
     "promises-aplus-tests": "^2.1.2"
   }
 }
