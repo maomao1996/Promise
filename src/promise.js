@@ -270,13 +270,22 @@ class Promise {
    */
   static all(promises) {
     return new Promise((resolve, reject) => {
+      // 参数不为数组时直接 reject
+      if (!Array.isArray(promises)) {
+        reject(new TypeError('参数必须为数组'))
+        return
+      }
+
       const result = []
-      // 记录当前已成功的 Promise 数量
-      let num = 0
+
       // 如果传入一个空数组则直接返回
       if (promises.length === 0) {
         resolve(result)
+        return
       }
+
+      // 记录当前已成功的 Promise 数量
+      let num = 0
 
       // resolve 验证函数
       function check(i, data) {
@@ -311,18 +320,21 @@ class Promise {
    */
   static race(promises) {
     return new Promise((resolve, reject) => {
+      // 参数不为数组时直接 reject
+      if (!Array.isArray(promises)) {
+        reject(new TypeError('参数必须为数组'))
+        return
+      }
+
+      // 如果传入一个空数组则直接返回
+      if (promises.length === 0) {
+        resolve()
+        return
+      }
+
       for (let i = 0; i < promises.length; i++) {
         // 只要有一个 Promise 状态发生改变，就调用其状态对应的回调方法
-        Promise.resolve(promises[i]).then(
-          (v) => {
-            resolve(v)
-            return
-          },
-          (e) => {
-            reject(e)
-            return
-          }
-        )
+        Promise.resolve(promises[i]).then(resolve, reject)
       }
     })
   }
@@ -336,13 +348,22 @@ class Promise {
    */
   static allSettled(promises) {
     return new Promise((resolve, reject) => {
+      // 参数不为数组时直接 reject
+      if (!Array.isArray(promises)) {
+        reject(new TypeError('参数必须为数组'))
+        return
+      }
+
       const result = []
-      // 记录当前已返回结果的 Promise 数量
-      let num = 0
+
       // 如果传入一个空数组则直接返回
       if (promises.length === 0) {
         resolve(result)
+        return
       }
+
+      // 记录当前已返回结果的 Promise 数量
+      let num = 0
 
       // resolve 验证函数
       function check(i, data) {
@@ -381,13 +402,21 @@ class Promise {
    */
   static any(promises) {
     return new Promise((resolve, reject) => {
-      const rejects = []
-      // 记录当前已失败的 Promise 数量
-      let num = 0
+      // 参数不为数组时直接 reject
+      if (!Array.isArray(promises)) {
+        reject(new TypeError('参数必须为数组'))
+        return
+      }
+
       // 如果传入一个空数组则直接返回
       if (promises.length === 0) {
         resolve()
+        return
       }
+
+      const rejects = []
+      // 记录当前已失败的 Promise 数量
+      let num = 0
 
       // reject 验证函数
       function check(i, data) {
@@ -400,16 +429,10 @@ class Promise {
       }
 
       for (let i = 0; i < promises.length; i++) {
-        promises[i].then(
-          (v) => {
-            // 当其中一个 Promise 成功时直接调用 resolve
-            resolve(v)
-            return
-          },
-          (r) => {
-            check(i, r)
-          }
-        )
+        // 当其中一个 Promise 成功时直接调用 resolve
+        promises[i].then(resolve, (r) => {
+          check(i, r)
+        })
       }
     })
   }
