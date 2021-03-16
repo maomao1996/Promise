@@ -26,28 +26,46 @@ function nextTick(fn) {
   setTimeout(fn, 0)
 }
 
-function resolvePromise(promise2, x, resolve, reject) {
-  // promise2 返回结果 x 为自身，应直接执行 reject
+/**
+ * 规范 2.3
+ * 实现兼容多种 Promise 的 resolutionProcedure 函数
+ */
+function resolutionProcedure(promise2, x, resolve, reject) {
+  // 2.3.1 promise2 返回结果 x 为自身，应直接执行 reject
   if (promise2 === x) {
     return reject(new TypeError('Error 循环引用'))
   }
 
+  // 2.3.2 如果 x 是一个 Promise 实例
+  if (x instanceof Promise) {
+    x.then(
+      // 继续调用 resolutionProcedure 解析
+      // 防止 value 的返回值还是一个 Promise
+      (value) => resolutionProcedure(promise2, value, resolve, reject),
+      reject
+    )
+    return
+  }
+
   // 设置一个标志位，防止重复调用
   let called = false
-  // 判断 x 是不是对象或函数
+  // 2.3.3 判断 x 是不是对象或函数
   if (isObject(x) || isFunction(x)) {
     // 防止取值时出错
     try {
+      // 2.3.3.1 让 x 作为 x.then
       let then = x.then
-      // 如果 then 是一个函数就认为他是一个 Promise，如果不是就直接调用 resolve(x)
+
       if (isFunction(then)) {
+        // 2.3.3.3 如果 then 是一个方法，把 x 当作 this 来调用它
+        // 其中第一个参数为 resolvePromise，第二个参数为 rejectPromise
         then.call(
           x,
           (y) => {
             if (called) return
             called = true
             // 防止 y 的返回值还是一个 Promise
-            resolvePromise(promise2, y, resolve, reject)
+            resolutionProcedure(promise2, y, resolve, reject)
           },
           (r) => {
             // 失败结果会向下传递
@@ -57,15 +75,17 @@ function resolvePromise(promise2, x, resolve, reject) {
           }
         )
       } else {
+        // 2.3.3.4 如果 then 不是一个函数，用 x 完成 promise
         resolve(x)
       }
     } catch (error) {
+      // 2.3.3.2 如果取 x.then 的值时抛出错误 e 则以 e 为据因执行 reject
       if (called) return
       called = true
       reject(error)
     }
   } else {
-    // x 是一个普通值就直接调用 resolve(x)
+    // 2.3.4 x 是一个普通值就直接调用 resolve(x)
     resolve(x)
   }
 }
@@ -93,6 +113,11 @@ class Promise {
      */
     // 成功函数
     const resolve = (value) => {
+      // 如果 value 是个 Promise 则递归执行
+      if (value instanceof Promise) {
+        return value.then(resolve, reject)
+      }
+
       nextTick(() => {
         if (this.state === PENDING) {
           this.state = FULFILLED
@@ -154,8 +179,8 @@ class Promise {
           try {
             // 为了链式调用，需要获取 onFulfilled 函数执行的返回值，通过 resolve 返回
             const x = onFulfilled(this.value)
-            // 通过 resolvePromise 函数对 x 的返回值做处理
-            resolvePromise(promise2, x, resolve, reject)
+            // 通过 resolutionProcedure 函数对 x 的返回值做处理
+            resolutionProcedure(promise2, x, resolve, reject)
           } catch (error) {
             reject(error)
           }
@@ -167,7 +192,7 @@ class Promise {
           try {
             // 为了链式调用，需要获取 onRejected 函数执行的返回值，通过 resolve 返回
             const x = onRejected(this.reason)
-            resolvePromise(promise2, x, resolve, reject)
+            resolutionProcedure(promise2, x, resolve, reject)
           } catch (error) {
             reject(error)
           }
@@ -180,8 +205,8 @@ class Promise {
         this.resolvedCallbacks.push(() => {
           try {
             const x = onFulfilled(this.value)
-            // 通过 resolvePromise 函数对 x 的返回值做处理
-            resolvePromise(promise2, x, resolve, reject)
+            // 通过 resolutionProcedure 函数对 x 的返回值做处理
+            resolutionProcedure(promise2, x, resolve, reject)
           } catch (error) {
             reject(error)
           }
@@ -190,7 +215,7 @@ class Promise {
         this.rejectedCallbacks.push(() => {
           try {
             const x = onRejected(this.reason)
-            resolvePromise(promise2, x, resolve, reject)
+            resolutionProcedure(promise2, x, resolve, reject)
           } catch (error) {
             reject(error)
           }
