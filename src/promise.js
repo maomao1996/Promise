@@ -461,6 +461,29 @@ class Promise {
       }
     })
   }
+
+  /**
+   * Promise.promisify() 实现
+   * 用于将回调函数转换为 promise 的辅助函数，适用于 error-first 回调模式(nodejs)
+   * error-first 模式的回调函数无论成功或者失败都会执行
+   * error-first 回调定义规则：
+   *    1. 回调函数的第一个参数保留给一个错误 error 对象，如果有错误发生，错误将通过第一个参数 err 返回。
+   *    2. 回调函数的第二个参数为成功响应的数据保留，如果没有错误发生，err将被设置为null, 成功的数据将从第二个参数返回。
+   *
+   */
+  static promisify(func) {
+    return function (...options) {
+      return new Promise((resolve, reject) => {
+        func(...options, (err, ...data) => {
+          // 通过回调函数返回的参数来控制 promise 的状态
+          if (err) {
+            reject(err)
+          }
+          resolve(...data)
+        })
+      })
+    }
+  }
 }
 
 // promises-aplus-tests 测试方法

@@ -1,4 +1,6 @@
 const assert = require('assert')
+const fs = require('fs')
+
 const Promise = require('../src/promise')
 
 describe('Promise Function', function () {
@@ -518,6 +520,30 @@ describe('Promise Function', function () {
         },
         function () {
           assert.fail()
+        }
+      )
+    })
+  })
+
+  describe('Promise.promisify', () => {
+    it('works on resolved promises', function () {
+      return Promise.promisify(fs.appendFile)('README.md', '').then(
+        function () {
+          assert.ok(true)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+
+    it('works on resolved promises', function () {
+      return Promise.promisify(fs.appendFile)('', 'README.md').then(
+        function () {
+          assert.fail()
+        },
+        function () {
+          assert.ok(true)
         }
       )
     })

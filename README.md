@@ -22,3 +22,4 @@
   - [Promise.race()](/src/promise.js#L340)
   - [Promise.allSettled()](/src/promise.js#L367)
   - [Promise.any()](/src/promise.js#L422)
+  - [Promise.promisify()](/src/promise.js#465)
