@@ -323,7 +323,7 @@ class Promise {
       }
 
       for (let i = 0; i < promises.length; i++) {
-        promises[i].then(
+        Promise.resolve(promises[i]).then(
           (v) => {
             check(i, v)
           },
@@ -401,7 +401,7 @@ class Promise {
       }
 
       for (let i = 0; i < promises.length; i++) {
-        promises[i].then(
+        Promise.resolve(promises[i]).then(
           (value) => {
             check(i, {
               status: FULFILLED,
@@ -455,7 +455,7 @@ class Promise {
 
       for (let i = 0; i < promises.length; i++) {
         // 当其中一个 Promise 成功时直接调用 resolve
-        promises[i].then(resolve, (r) => {
+        Promise.resolve(promises[i]).then(resolve, (r) => {
           check(i, r)
         })
       }

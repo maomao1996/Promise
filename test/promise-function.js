@@ -126,6 +126,16 @@ describe('Promise Function', function () {
         }
       )
     })
+    it('works on [1]', function () {
+      return Promise.all([1]).then(
+        function (arr) {
+          assert.ok(arr.length === 1)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
   })
 
   describe('Promise.race', function () {
@@ -244,8 +254,24 @@ describe('Promise Function', function () {
       )
     })
     it('works on empty array', function () {
-      var prom = Promise.race([])
-      return assert(prom instanceof Promise)
+      return Promise.race([]).then(
+        function (val) {
+          assert.ok(val === undefined)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+    it('works on [1]', function () {
+      return Promise.race([1]).then(
+        function (val) {
+          assert.ok(val === 1)
+        },
+        function () {
+          assert.fail()
+        }
+      )
     })
   })
 
@@ -362,6 +388,16 @@ describe('Promise Function', function () {
         }
       )
     })
+    it('works on [1]', function () {
+      return Promise.allSettled([1]).then(
+        function (arr) {
+          assert.ok(arr.length === 1)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
   })
 
   describe('Promise.any', function () {
@@ -469,6 +505,16 @@ describe('Promise Function', function () {
       return Promise.any([]).then(
         function () {
           assert.ok(true)
+        },
+        function () {
+          assert.fail()
+        }
+      )
+    })
+    it('works on [1]', function () {
+      return Promise.any([1]).then(
+        function (val) {
+          assert.ok(val === 1)
         },
         function () {
           assert.fail()
