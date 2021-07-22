@@ -13,11 +13,14 @@ const REJECTED = 'rejected'
 /**
  * 工具方法
  **/
-function isFunction(v) {
-  return typeof v === 'function'
+function isFunction(value) {
+  return typeof value === 'function'
 }
-function isObject(v) {
-  return typeof v === 'object' && v !== null
+function isObject(value) {
+  return typeof value === 'object' && value !== null
+}
+function isIterator(value) {
+  return value && isFunction(value[Symbol.iterator])
 }
 
 // 定时器函数
@@ -295,15 +298,15 @@ class Promise {
    */
   static all(promises) {
     return new Promise((resolve, reject) => {
-      // 参数不为数组时直接 reject
-      if (!Array.isArray(promises)) {
-        reject(new TypeError('参数必须为数组'))
+      // 参数不为 Iterator 时直接 reject
+      if (!isIterator(promises)) {
+        reject(new TypeError('参数必须为 Iterator'))
         return
       }
 
       const result = []
 
-      // 如果传入一个空数组则直接返回
+      // length 为 0 时直接返回
       if (promises.length === 0) {
         resolve(result)
         return
@@ -345,15 +348,9 @@ class Promise {
    */
   static race(promises) {
     return new Promise((resolve, reject) => {
-      // 参数不为数组时直接 reject
-      if (!Array.isArray(promises)) {
-        reject(new TypeError('参数必须为数组'))
-        return
-      }
-
-      // 如果传入一个空数组则直接返回
-      if (promises.length === 0) {
-        resolve()
+      // 参数不为 Iterator 时直接 reject
+      if (!isIterator(promises)) {
+        reject(new TypeError('参数必须为 Iterator'))
         return
       }
 
@@ -373,15 +370,15 @@ class Promise {
    */
   static allSettled(promises) {
     return new Promise((resolve, reject) => {
-      // 参数不为数组时直接 reject
-      if (!Array.isArray(promises)) {
-        reject(new TypeError('参数必须为数组'))
+      // 参数不为 Iterator 时直接 reject
+      if (!isIterator(promises)) {
+        reject(new TypeError('参数必须为 Iterator'))
         return
       }
 
       const result = []
 
-      // 如果传入一个空数组则直接返回
+      // length 为 0 时直接返回
       if (promises.length === 0) {
         resolve(result)
         return
@@ -427,19 +424,18 @@ class Promise {
    */
   static any(promises) {
     return new Promise((resolve, reject) => {
-      // 参数不为数组时直接 reject
-      if (!Array.isArray(promises)) {
-        reject(new TypeError('参数必须为数组'))
-        return
-      }
-
-      // 如果传入一个空数组则直接返回
-      if (promises.length === 0) {
-        resolve()
-        return
-      }
-
       const rejects = []
+
+      // 如果 length 为 0 时直接 reject
+      if (promises.length === 0) {
+        /**
+         * https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/AggregateError
+         * reject(new AggregateError(rejects, 'All promises were rejected'))
+         */
+        reject(new Error('All promises were rejected'))
+        return
+      }
+
       // 记录当前已失败的 Promise 数量
       let num = 0
 
