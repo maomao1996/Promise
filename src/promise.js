@@ -169,11 +169,14 @@ class Promise {
           throw e
         }
     /**
-     * 在链式调用时需要返回一个新的 promise
-     * 在 then 函数中，无论是成功还是失败的回调，只要返回了结果就会传入下一个 then 的成功回调
-     * 如果出现错误就会传入下一个 then 的失败回调
-     * 即：下一个 then 的状态和上一个 then 执行时候的状态无关
-     * 所以在 then 执行的时候 onFulfilled, onRejected 可能会出现错误，需要捕获错误，并执行失败回调（处理成失败状态）
+     * 在链式调用时需要返回一个新的 Promise，在 then 方法中，无论是成功还是失败的回调，只要返回了结果就会传入下一个 then 的回调
+     * 当 then 方法返回的是一个 Promise 则根据这个 Promise 的状态去调用下一个 then 对应的回调
+     * 当 then 方法返回的不是 Promise 则直接传入下一个 then 的成功回调
+     * 如果在执行时出现错误就会传入下一个 then 的失败回调
+     * 在 then 方法执行时， onFulfilled onRejected 可能会出现错误，这时需要捕获错误，并执行失败回调（处理成失败状态）
+     * 总结：
+     *    1. 下一个 then 的状态和上一个 then 执行时候的状态无关
+     *    2. 只有在 then 方法执行出错或返回的是一个失败的 Promise 时才会走下一个 then 的失败回调，其他情况都会走下一个 then 的成功回调
      */
     const promise2 = new Promise((resolve, reject) => {
       if (this.state === FULFILLED) {
@@ -300,7 +303,7 @@ class Promise {
     return new Promise((resolve, reject) => {
       // 参数不为 Iterator 时直接 reject
       if (!isIterator(promises)) {
-        reject(new TypeError('参数必须为 Iterator'))
+        reject(new TypeError('参数必须具有 Iterator 接口'))
         return
       }
 
@@ -350,7 +353,7 @@ class Promise {
     return new Promise((resolve, reject) => {
       // 参数不为 Iterator 时直接 reject
       if (!isIterator(promises)) {
-        reject(new TypeError('参数必须为 Iterator'))
+        reject(new TypeError('参数必须具有 Iterator 接口'))
         return
       }
 
@@ -372,7 +375,7 @@ class Promise {
     return new Promise((resolve, reject) => {
       // 参数不为 Iterator 时直接 reject
       if (!isIterator(promises)) {
-        reject(new TypeError('参数必须为 Iterator'))
+        reject(new TypeError('参数必须具有 Iterator 接口'))
         return
       }
 
@@ -424,6 +427,11 @@ class Promise {
    */
   static any(promises) {
     return new Promise((resolve, reject) => {
+      // 参数不为 Iterator 时直接 reject
+      if (!isIterator(promises)) {
+        reject(new TypeError('参数必须具有 Iterator 接口'))
+        return
+      }
       const rejects = []
 
       // 如果 length 为 0 时直接 reject
